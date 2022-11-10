@@ -1,14 +1,15 @@
 {
     "name": "@rigidity/chia-wallet",
     "author": "rigidity",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Unofficial implementations for standard puzzles and the wallet for Chia.",
     "repository": "https://github.com/Rigidity/chia-wallet.git",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "license": "MIT",
     "files": [
-        "dist"
+        "dist",
+        "puzzles"
     ],
     "devDependencies": {
         "@types/node": "^18.11.9",
