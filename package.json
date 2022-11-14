@@ -1,7 +1,7 @@
 {
     "name": "@rigidity/chia-wallet",
     "author": "rigidity",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "description": "Unofficial implementations for standard puzzles and the wallet for Chia.",
     "repository": "https://github.com/Rigidity/chia-wallet.git",
     "main": "dist/index.js",

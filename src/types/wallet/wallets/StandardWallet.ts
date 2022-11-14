@@ -1,4 +1,6 @@
-import { FullNode, SpendBundle } from '@rigidity/chia';
+import { toHex } from '@rigidity/bls-signatures';
+import { CoinSpend, formatHex, FullNode, SpendBundle } from '@rigidity/chia';
+import { Program } from '@rigidity/clvm';
 import {
     calculateSyntheticPrivateKey,
     calculateSyntheticPublicKey,
@@ -6,6 +8,7 @@ import {
 import { puzzles } from '../../../utils/puzzles';
 import { signSpendBundle } from '../../../utils/sign';
 import { StandardTransaction } from '../../puzzles/StandardTransaction';
+import { CoinSelection } from '../CoinSelection';
 import { KeyPair, KeyStore } from '../KeyStore';
 import { Wallet, WalletOptions } from '../Wallet';
 
@@ -20,6 +23,59 @@ export class StandardWallet extends Wallet<StandardTransaction> {
     ) {
         super(node, keyStore, walletOptions);
         this.hiddenPuzzleHash = hiddenPuzzleHash;
+    }
+
+    public async send(
+        puzzleHash: Uint8Array,
+        amount: number,
+        fee: number
+    ): Promise<CoinSpend[]> {
+        const totalAmount = amount + fee;
+
+        const coinRecords = this.selectCoinRecords(
+            totalAmount,
+            CoinSelection.Oldest
+        );
+
+        const spendAmount = coinRecords.reduce(
+            (amount, coinRecord) => amount + coinRecord.coin.amount,
+            0
+        );
+
+        const change =
+            this.puzzleCache[(await this.findUnusedIndices(1, []))[0]];
+
+        const puzzles = coinRecords.map(
+            (coinRecord) => this.puzzleCache[this.coinRecordIndex(coinRecord)]
+        );
+
+        const coinSpends = coinRecords.map((record, i) => {
+            const puzzle = puzzles[i];
+
+            const conditions: Array<Program> = [];
+
+            if (i === 0) {
+                conditions.push(
+                    Program.fromSource(
+                        `(51 ${formatHex(toHex(puzzleHash))} ${amount})`
+                    )
+                );
+
+                if (spendAmount > totalAmount) {
+                    conditions.push(
+                        Program.fromSource(
+                            `(51 ${formatHex(change.hashHex())} ${
+                                spendAmount - totalAmount
+                            })`
+                        )
+                    );
+                }
+            }
+
+            return puzzle.spend(record.coin, puzzle.getSolution(conditions));
+        });
+
+        return coinSpends;
     }
 
     public createPuzzle(keyPair: KeyPair): StandardTransaction {
