@@ -1,5 +1,5 @@
-import { Coin, CoinSpend } from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+import { Coin, CoinSpend } from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import { AssetToken } from '../puzzles/AssetToken';
 import { AssetCoin } from './AssetCoin';
 

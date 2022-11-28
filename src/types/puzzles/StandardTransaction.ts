@@ -1,6 +1,6 @@
-import { JacobianPoint } from '@rigidity/bls-signatures';
-import { Coin, CoinSpend } from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+import { JacobianPoint } from 'chia-bls';
+import { Coin, CoinSpend } from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import { puzzles } from '../../utils/puzzles';
 
 export class StandardTransaction extends Program {

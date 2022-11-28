@@ -1,4 +1,4 @@
-import { bytesEqual, JacobianPoint, toHex } from '@rigidity/bls-signatures';
+import { bytesEqual, JacobianPoint, toHex } from 'chia-bls';
 import {
     Coin,
     CoinRecord,
@@ -7,8 +7,8 @@ import {
     sanitizeHex,
     SpendBundle,
     toCoinId,
-} from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+} from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import { CoinSelection } from './CoinSelection';
 import { KeyPair, KeyStore } from './KeyStore';
 

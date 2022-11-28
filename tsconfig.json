@@ -1,17 +1,15 @@
 {
     "compilerOptions": {
+        "moduleResolution": "node",
+        "target": "ESNext",
+        "module": "CommonJS",
         "downlevelIteration": true,
         "esModuleInterop": true,
-        "inlineSourceMap": true,
         "declaration": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitOverride": true,
         "strict": true,
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        "target": "ESNext",
-        "outDir": "dist"
-    },
-    "include": ["src"]
+        "types": ["node"]
+    }
 }

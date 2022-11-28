@@ -1,5 +1,5 @@
-import { JacobianPoint } from '@rigidity/bls-signatures';
-import { Program } from '@rigidity/clvm';
+import { JacobianPoint } from 'chia-bls';
+import { Program } from 'clvm-lib';
 import { puzzles } from '../../../utils/puzzles';
 
 export class EverythingWithSignatureTail extends Program {

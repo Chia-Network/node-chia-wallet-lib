@@ -1,5 +1,5 @@
-import { Coin, CoinSpend, sanitizeHex } from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+import { Coin, CoinSpend, sanitizeHex } from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import { puzzles } from '../../utils/puzzles';
 
 export class AssetCoin {

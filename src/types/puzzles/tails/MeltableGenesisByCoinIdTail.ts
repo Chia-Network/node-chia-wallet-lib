@@ -1,4 +1,4 @@
-import { Program } from '@rigidity/clvm';
+import { Program } from 'clvm-lib';
 import { puzzles } from '../../../utils/puzzles';
 
 export class MeltableGenesisByCoinIdTail extends Program {

@@ -1,12 +1,6 @@
-import { bytesEqual, modNumber, toHex } from '@rigidity/bls-signatures';
-import {
-    Coin,
-    CoinSpend,
-    formatHex,
-    sanitizeHex,
-    toCoinId,
-} from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+import { bytesEqual, modNumber, toHex } from 'chia-bls';
+import { Coin, CoinSpend, formatHex, sanitizeHex, toCoinId } from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import { puzzles } from '../../utils/puzzles';
 import { SpendableAssetCoin } from '../coins/SpendableAssetCoin';
 
