@@ -1,6 +1,6 @@
-import { toHex } from '@rigidity/bls-signatures';
-import { CoinSpend, formatHex, FullNode, SpendBundle } from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+import { toHex } from 'chia-bls';
+import { CoinSpend, formatHex, FullNode, SpendBundle } from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import {
     calculateSyntheticPrivateKey,
     calculateSyntheticPublicKey,

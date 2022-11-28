@@ -1,4 +1,4 @@
-import { JacobianPoint, PrivateKey } from '@rigidity/bls-signatures';
+import { JacobianPoint, PrivateKey } from 'chia-bls';
 import { derivePrivateKey, derivePublicKey } from '../../utils/keys';
 
 export interface KeyPair {

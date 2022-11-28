@@ -8,8 +8,8 @@ import {
     JacobianPoint,
     mod,
     PrivateKey,
-} from '@rigidity/bls-signatures';
-import { Program } from '@rigidity/clvm';
+} from 'chia-bls';
+import { Program } from 'clvm-lib';
 import { puzzles } from './puzzles';
 
 const groupOrder =

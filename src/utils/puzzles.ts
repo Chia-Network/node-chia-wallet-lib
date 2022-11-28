@@ -1,4 +1,4 @@
-import { Program } from '@rigidity/clvm';
+import { Program } from 'clvm-lib';
 import fs from 'fs';
 import path from 'path';
 

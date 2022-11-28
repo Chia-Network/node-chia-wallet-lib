@@ -6,9 +6,9 @@ import {
     hash256,
     JacobianPoint,
     PrivateKey,
-} from '@rigidity/bls-signatures';
-import { CoinSpend, sanitizeHex, SpendBundle } from '@rigidity/chia';
-import { Program } from '@rigidity/clvm';
+} from 'chia-bls';
+import { CoinSpend, sanitizeHex, SpendBundle } from 'chia-rpc';
+import { Program } from 'clvm-lib';
 
 export function signSpendBundle(
     spendBundle: SpendBundle,
