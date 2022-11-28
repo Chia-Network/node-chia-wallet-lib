@@ -16,7 +16,9 @@ export function signSpendBundle(
     partial: boolean,
     ...privateKeys: PrivateKey[]
 ): void {
-    const signatures: Array<JacobianPoint> = [];
+    const signatures: Array<JacobianPoint> = [
+        JacobianPoint.fromHexG2(sanitizeHex(spendBundle.aggregated_signature)),
+    ];
 
     for (const coinSpend of spendBundle.coin_spends) {
         signatures.push(
