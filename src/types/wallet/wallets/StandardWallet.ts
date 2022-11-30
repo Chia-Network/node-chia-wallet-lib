@@ -25,6 +25,47 @@ export class StandardWallet extends Wallet<StandardTransaction> {
         this.hiddenPuzzleHash = hiddenPuzzleHash;
     }
 
+    public async sendFee(amount: number): Promise<CoinSpend[]> {
+        const coinRecords = this.selectCoinRecords(
+            amount,
+            CoinSelection.Oldest
+        );
+
+        const spendAmount = coinRecords.reduce(
+            (amount, coinRecord) => amount + coinRecord.coin.amount,
+            0
+        );
+
+        const change =
+            this.puzzleCache[(await this.findUnusedIndices(1, []))[0]];
+
+        const puzzles = coinRecords.map(
+            (coinRecord) => this.puzzleCache[this.coinRecordIndex(coinRecord)]
+        );
+
+        const coinSpends = coinRecords.map((record, i) => {
+            const puzzle = puzzles[i];
+
+            const conditions: Array<Program> = [];
+
+            if (i === 0) {
+                if (spendAmount > amount) {
+                    conditions.push(
+                        Program.fromSource(
+                            `(51 ${formatHex(change.hashHex())} ${
+                                spendAmount - amount
+                            })`
+                        )
+                    );
+                }
+            }
+
+            return puzzle.spend(record.coin, puzzle.getSolution(conditions));
+        });
+
+        return coinSpends;
+    }
+
     public async send(
         puzzleHash: Uint8Array,
         amount: number,
