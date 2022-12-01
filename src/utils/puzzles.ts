@@ -29,7 +29,7 @@ function puzzle(...name: string[]): Program {
                     ...name.slice(0, -1),
                     name.at(-1) + '.clvm.hex'
                 ),
-                'utf-8'
+                'utf8'
             )
             .trim()
     );

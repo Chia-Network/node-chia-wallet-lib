@@ -56,7 +56,12 @@ export class AssetToken<T extends Program> extends Program {
         return puzzles.cat.curry([
             Program.fromBytes(puzzles.cat.hash()),
             Program.fromBytes(tail.hash()),
-            this.calculateIssuePayment(tail, solution, innerPuzzleHash, amount),
+            AssetToken.calculateIssuePayment(
+                tail,
+                solution,
+                innerPuzzleHash,
+                amount
+            ),
         ]) as AssetToken<Program>;
     }
 
