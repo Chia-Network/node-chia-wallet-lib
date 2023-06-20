@@ -11,7 +11,7 @@ import {
 } from '../utils/puzzles';
 import { createSingletonStruct } from './singleton';
 
-export function createNftSingleton(
+export function curryNftSingleton(
     launcherId: Uint8Array,
     metadata: Program,
     metadataUpdaterPuzzleHash: Uint8Array,
@@ -23,7 +23,7 @@ export function createNftSingleton(
         SINGLETON_LAUNCHER_HASH
     );
 
-    const singletonInnerPuzzle = createNftStateLayer(
+    const singletonInnerPuzzle = curryNftStateLayer(
         metadata,
         metadataUpdaterPuzzleHash,
         innerPuzzle
@@ -32,7 +32,7 @@ export function createNftSingleton(
     return SINGLETON.curry([singletonStruct, singletonInnerPuzzle]);
 }
 
-export function createNftStateLayer(
+export function curryNftStateLayer(
     metadata: Program,
     metadataUpdaterPuzzleHash: Uint8Array,
     innerPuzzle: Program
@@ -45,7 +45,7 @@ export function createNftStateLayer(
     ]);
 }
 
-export function createNftOwnershipLayer(
+export function curryNftOwnershipLayer(
     launcherId: Uint8Array,
     did: Uint8Array | null,
     innerPuzzle: Program,

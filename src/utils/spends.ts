@@ -1,7 +1,14 @@
-import { concatBytes, fromHex, hash256, intToBytes } from 'chia-bls';
-import { SpendBundle, sanitizeHex } from 'chia-rpc';
+import {
+    AugSchemeMPL,
+    JacobianPoint,
+    concatBytes,
+    fromHex,
+    hash256,
+    intToBytes,
+} from 'chia-bls';
+import { CoinSpend, SpendBundle, sanitizeHex } from 'chia-rpc';
 
-export function getTransactionId(spendBundle: SpendBundle): Uint8Array {
+export function getSpendBundleId(spendBundle: SpendBundle): Uint8Array {
     return hash256(
         concatBytes(
             intToBytes(spendBundle.coin_spends.length, 4, 'big'),
@@ -24,4 +31,25 @@ export function getTransactionId(spendBundle: SpendBundle): Uint8Array {
             fromHex(sanitizeHex(spendBundle.aggregated_signature))
         )
     );
+}
+
+export function aggregateSpendBundles(
+    ...spendBundles: SpendBundle[]
+): SpendBundle {
+    const coinSpends: Array<CoinSpend> = [];
+    const signatures: Array<JacobianPoint> = [];
+
+    for (const spendBundle of spendBundles) {
+        coinSpends.push(...spendBundle.coin_spends);
+        signatures.push(
+            JacobianPoint.fromHexG2(
+                sanitizeHex(spendBundle.aggregated_signature)
+            )
+        );
+    }
+
+    return {
+        coin_spends: coinSpends,
+        aggregated_signature: AugSchemeMPL.aggregate(signatures).toHex(),
+    };
 }
