@@ -2,7 +2,7 @@ import { Program } from 'clvm-lib';
 import fs from 'fs';
 import path from 'path';
 
-const basePath = path.join(__dirname, '..', '..', 'puzzles');
+const basePath = path.join(__dirname, '..', '..');
 const walletPath = path.join(basePath, 'wallet');
 
 const puzzle = (name: string) =>
