@@ -8,8 +8,8 @@ import {
     SINGLETON,
     SINGLETON_HASH,
     SINGLETON_LAUNCHER_HASH,
-    createSingletonStruct,
 } from '../utils/puzzles';
+import { createSingletonStruct } from './singleton';
 
 export function createNftSingleton(
     launcherId: Uint8Array,

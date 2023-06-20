@@ -29,17 +29,3 @@ export const NFT_OWNERSHIP_LAYER_HASH = NFT_OWNERSHIP_LAYER.hash();
 
 export const NFT_TRANSFER_ROYALTIES = puzzle('nft-transfer-royalties');
 export const NFT_TRANSFER_PROGRAM = puzzle('nft-transfer-program');
-
-export function createSingletonStruct(
-    singletonModHash: Uint8Array,
-    launcherId: Uint8Array,
-    launcherPuzzleHash: Uint8Array
-): Program {
-    return Program.cons(
-        Program.fromBytes(singletonModHash),
-        Program.cons(
-            Program.fromBytes(launcherId),
-            Program.fromBytes(launcherPuzzleHash)
-        )
-    );
-}
