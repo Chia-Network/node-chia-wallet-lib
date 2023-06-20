@@ -9,8 +9,6 @@ import {
     mod,
     PrivateKey,
 } from 'chia-bls';
-import { Program } from 'clvm-lib';
-import { puzzles } from './puzzles';
 
 const groupOrder =
     0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001n;
@@ -19,14 +17,10 @@ export function calculateSyntheticPublicKey(
     publicKey: JacobianPoint,
     hiddenPuzzleHash: Uint8Array
 ): JacobianPoint {
-    return JacobianPoint.fromBytes(
-        puzzles.syntheticPublicKey.run(
-            Program.fromList([
-                Program.fromJacobianPoint(publicKey),
-                Program.fromBytes(hiddenPuzzleHash),
-            ])
-        ).value.atom,
-        false
+    return publicKey.add(
+        PrivateKey.fromBytes(
+            hash256(concatBytes(publicKey.toBytes(), hiddenPuzzleHash))
+        ).getG1()
     );
 }
 

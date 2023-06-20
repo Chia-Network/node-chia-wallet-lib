@@ -2,35 +2,40 @@ import { Program } from 'clvm-lib';
 import fs from 'fs';
 import path from 'path';
 
-export const puzzles = {
-    cat: puzzle('cat'),
-    syntheticPublicKey: puzzle('synthetic_public_key'),
-    defaultHidden: puzzle('default_hidden'),
-    payToConditions: puzzle('pay_to_conditions'),
-    payToDelegatedOrHidden: puzzle('pay_to_delegated_or_hidden'),
-    tails: {
-        delegated: puzzle('tails', 'delegated'),
-        everythingWithSignature: puzzle('tails', 'everything_with_signature'),
-        indexedWithSignature: puzzle('tails', 'indexed_with_signature'),
-        genesisByCoinId: puzzle('tails', 'genesis_by_coin_id'),
-        meltableGenesisByCoinId: puzzle('tails', 'meltable_genesis_by_coin_id'),
-    },
-};
+const basePath = path.join(__dirname, '..', '..', 'puzzles');
+const walletPath = path.join(basePath, 'wallet');
 
-function puzzle(...name: string[]): Program {
-    return Program.deserializeHex(
-        fs
-            .readFileSync(
-                path.join(
-                    __dirname,
-                    '..',
-                    '..',
-                    'puzzles',
-                    ...name.slice(0, -1),
-                    name.at(-1) + '.clvm.hex'
-                ),
-                'utf-8'
-            )
-            .trim()
+const puzzle = (name: string) =>
+    Program.deserializeHex(
+        fs.readFileSync(path.join(walletPath, `${name}.clsp.hex`), 'utf-8')
+    );
+
+export const DID = puzzle('did');
+export const SINGLETON = puzzle('singleton');
+export const SINGLETON_LAUNCHER = puzzle('singleton-launcher');
+export const STANDARD_TRANSACTION = puzzle('standard-transaction');
+export const NFT_STATE_LAYER = puzzle('nft-state-layer');
+export const NFT_OWNERSHIP_LAYER = puzzle('nft-ownership-layer');
+export const NFT_TRANSFER_ROYALTIES = puzzle('nft-transfer-royalties');
+export const NFT_TRANSFER_PROGRAM = puzzle('nft-transfer-program');
+export const HIDDEN_PUZZLE = puzzle('hidden-puzzle');
+
+export const SINGLETON_HASH = SINGLETON.hash();
+export const SINGLETON_LAUNCHER_HASH = SINGLETON_LAUNCHER.hash();
+export const NFT_OWNERSHIP_LAYER_HASH = NFT_OWNERSHIP_LAYER.hash();
+export const NFT_STATE_LAYER_HASH = NFT_STATE_LAYER.hash();
+export const HIDDEN_PUZZLE_HASH = HIDDEN_PUZZLE.hash();
+
+export function createSingletonStruct(
+    singletonModHash: Uint8Array,
+    launcherId: Uint8Array,
+    launcherPuzzleHash: Uint8Array
+): Program {
+    return Program.cons(
+        Program.fromBytes(singletonModHash),
+        Program.cons(
+            Program.fromBytes(launcherId),
+            Program.fromBytes(launcherPuzzleHash)
+        )
     );
 }
