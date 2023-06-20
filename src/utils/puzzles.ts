@@ -2,12 +2,11 @@ import { Program } from 'clvm-lib';
 import fs from 'fs';
 import path from 'path';
 
-const basePath = path.join(__dirname, '..', '..');
-const walletPath = path.join(basePath, 'wallet');
+const basePath = path.join(__dirname, '..', '..', 'puzzles');
 
 const puzzle = (name: string) =>
     Program.deserializeHex(
-        fs.readFileSync(path.join(walletPath, `${name}.clsp.hex`), 'utf-8')
+        fs.readFileSync(path.join(basePath, `${name}.clsp.hex`), 'utf-8')
     );
 
 export const STANDARD_TRANSACTION = puzzle('standard-transaction');
