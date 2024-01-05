@@ -20,8 +20,8 @@ export interface WalletOptions {
 }
 
 const defaultWalletOptions: WalletOptions = {
-    batchSize: 100,
-    minimumUnused: 100,
+    batchSize: 50,
+    minimumUnused: 10,
     maxDerivations: Infinity,
     updatePendingCoinRecords: true,
 };
