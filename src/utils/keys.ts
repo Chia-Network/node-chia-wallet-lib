@@ -97,3 +97,16 @@ export function derivePublicKey(
 ): JacobianPoint {
     return derivePublicKeyPath(masterPublicKey, [12381, 8444, 2, index]);
 }
+
+export function derivePrivateKeyIntermediate(
+    masterPrivateKey: PrivateKey,
+    hardened: boolean
+): PrivateKey {
+    return derivePrivateKeyPath(masterPrivateKey, [12381, 8444, 2], hardened);
+}
+
+export function derivePublicKeyIntermediate(
+    masterPublicKey: JacobianPoint
+): JacobianPoint {
+    return derivePublicKeyPath(masterPublicKey, [12381, 8444, 2]);
+}

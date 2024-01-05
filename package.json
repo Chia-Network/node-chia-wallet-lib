@@ -1,53 +1,28 @@
 {
     "name": "chia-wallet-lib",
     "author": "rigidity",
-    "version": "1.0.0",
-    "description": "Standard Chia puzzles and a wallet implementation.",
+    "version": "2.0.0",
+    "description": "Standard Chia puzzles and an example wallet implementation.",
     "repository": "https://github.com/Chia-Network/node-chia-wallet-lib.git",
     "license": "Apache-2.0",
-    "main": "dist/src/index.js",
+    "main": "dist/index.js",
     "source": "src/index.ts",
-    "types": "dist/src/index.d.ts",
-    "bundle": "dist/bundle.js",
+    "types": "dist/index.d.ts",
     "scripts": {
-        "build": "parcel build",
-        "watch": "parcel watch",
-        "test": "parcel build --target test && mocha './dist/test/test.js' --require source-map-support/register --recursive --timeout 0"
+        "build": "tsc",
+        "watch": "tsc -w"
     },
     "files": [
-        "dist/src",
+        "dist",
         "puzzles"
     ],
-    "targets": {
-        "main": {
-            "distDir": "dist/src",
-            "context": "node"
-        },
-        "test": {
-            "source": "test/test.ts",
-            "distDir": "dist/test",
-            "context": "node"
-        },
-        "bundle": {
-            "source": "src/browser.ts",
-            "context": "node"
-        }
-    },
     "devDependencies": {
-        "@parcel/packager-ts": "^2.8.0",
-        "@parcel/transformer-typescript-types": "^2.8.0",
-        "@types/chai": "^4.3.4",
-        "@types/mocha": "^10.0.1",
-        "@types/node": "^18.11.9",
-        "mocha": "^10.1.0",
-        "parcel": "^2.8.0",
-        "source-map-support": "^0.5.21",
-        "typescript": "~4.7"
+        "@types/node": "^20.10.6",
+        "typescript": "^5.3.3"
     },
     "dependencies": {
-        "chai": "^4.3.7",
         "chia-bls": "^1.0.1",
-        "chia-rpc": "^1.0.0",
+        "chia-rpc": "^1.1.1",
         "clvm-lib": "^1.0.0"
     }
 }

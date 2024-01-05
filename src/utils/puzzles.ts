@@ -2,12 +2,17 @@ import { Program } from 'clvm-lib';
 import fs from 'fs';
 import path from 'path';
 
+const standardTransaction = puzzle('pay_to_delegated_or_hidden');
+const defaultHidden = puzzle('default_hidden');
+
 export const puzzles = {
     cat: puzzle('cat'),
     syntheticPublicKey: puzzle('synthetic_public_key'),
-    defaultHidden: puzzle('default_hidden'),
+    defaultHidden,
+    defaultHiddenHash: defaultHidden.hash(),
     payToConditions: puzzle('pay_to_conditions'),
-    payToDelegatedOrHidden: puzzle('pay_to_delegated_or_hidden'),
+    standardTransaction,
+    standardTransactionHash: standardTransaction.hash(),
     tails: {
         delegated: puzzle('tails', 'delegated'),
         everythingWithSignature: puzzle('tails', 'everything_with_signature'),

@@ -10,20 +10,20 @@ import {
 } from 'chia-rpc';
 import { Program } from 'clvm-lib';
 import { CoinSelection } from './CoinSelection';
-import { KeyPair, KeyStore } from './KeyStore';
+import { KeyStore } from './KeyStore';
 
 export interface WalletOptions {
-    minAddressCount: number;
-    maxAddressCount: number;
-    unusedAddressCount: number;
-    instantCoinRecords: boolean;
+    batchSize: number;
+    minimumUnused: number;
+    maxDerivations: number;
+    updatePendingCoinRecords: boolean;
 }
 
 const defaultWalletOptions: WalletOptions = {
-    minAddressCount: 50,
-    maxAddressCount: Infinity,
-    unusedAddressCount: 10,
-    instantCoinRecords: true,
+    batchSize: 100,
+    minimumUnused: 100,
+    maxDerivations: Infinity,
+    updatePendingCoinRecords: true,
 };
 
 export abstract class Wallet<T extends Program> {
@@ -33,7 +33,7 @@ export abstract class Wallet<T extends Program> {
 
     public readonly coinRecords: Array<CoinRecord[]> = [];
     public readonly artificialCoinRecords: Array<CoinRecord> = [];
-    public readonly puzzleCache: Array<T> = [];
+    public readonly puzzleHashes: Array<Uint8Array> = [];
 
     constructor(
         node: FullNode,
@@ -45,12 +45,22 @@ export abstract class Wallet<T extends Program> {
         this.options = { ...defaultWalletOptions, ...walletOptions };
     }
 
-    public abstract createPuzzle(keyPair: KeyPair): T;
+    public abstract createPuzzle(index: number): T;
 
-    public coinRecordIndex(coinRecord: CoinRecord): number {
-        return this.puzzleCache.findIndex(
-            (puzzle) =>
-                coinRecord.coin.puzzle_hash === formatHex(puzzle.hashHex())
+    // TODO: This can be overridden for performance if needed.
+    public createPuzzleHash(index: number): Uint8Array {
+        return this.createPuzzle(index).hash();
+    }
+
+    public derivationIndexOf(puzzleHash: Uint8Array): number {
+        return this.puzzleHashes.findIndex((hash) =>
+            bytesEqual(hash, puzzleHash)
+        );
+    }
+
+    private unusedIndex(): number {
+        return this.coinRecords.findLastIndex(
+            (coinRecords) => !coinRecords.length
         );
     }
 
@@ -59,54 +69,35 @@ export abstract class Wallet<T extends Program> {
     ): Promise<void> {
         const options = { ...this.options, ...overrideOptions };
 
-        let keyCount = this.keyStore.keys.length;
-        let unusedCount = 0;
-
-        for (let i = this.coinRecords.length - 1; i >= 0; i--) {
-            const coinRecords = this.coinRecords[i];
-
-            if (!coinRecords.length) unusedCount++;
-            else break;
-        }
-
         while (
-            keyCount < options.maxAddressCount &&
-            (unusedCount < options.unusedAddressCount ||
-                keyCount < options.minAddressCount)
+            // There aren't enough unused derivations.
+            this.unusedIndex() < options.minimumUnused &&
+            // There aren't too many keys.
+            this.coinRecords.length < options.maxDerivations
         ) {
-            this.keyStore.generate(1);
-            const keyPair = this.keyStore.keys.at(-1)!;
-            const puzzle = this.createPuzzle(keyPair);
-            const coinRecords = await this.node.getCoinRecordsByPuzzleHash(
-                puzzle.hashHex(),
-                undefined,
-                undefined,
-                true
+            // Derive up to the maximum number of keys.
+            const count = Math.min(
+                options.batchSize,
+                options.maxDerivations - this.coinRecords.length
             );
-            if (!coinRecords.success) throw new Error(coinRecords.error);
-
-            keyCount++;
-            if (!coinRecords.coin_records.length) unusedCount++;
-            else unusedCount = 0;
+            this.keyStore.generate(this.coinRecords.length + count);
+            this.createPuzzles();
+            await this.fetchCoinRecords();
         }
-
-        this.createPuzzles();
-
-        await this.fetchCoinRecords();
     }
 
     public createPuzzles(): void {
         for (
-            let i = this.puzzleCache.length;
+            let i = this.puzzleHashes.length;
             i < this.keyStore.keys.length;
             i++
         ) {
-            this.puzzleCache[i] = this.createPuzzle(this.keyStore.keys[i]);
+            this.puzzleHashes.push(this.createPuzzleHash(i));
         }
     }
 
     public async fetchCoinRecords(): Promise<void> {
-        const puzzleHashes = this.puzzleCache.map((puzzle) => puzzle.hashHex());
+        const puzzleHashes = this.puzzleHashes.map((puzzle) => toHex(puzzle));
 
         const coinRecordResult = await this.node.getCoinRecordsByPuzzleHashes(
             puzzleHashes,
@@ -182,8 +173,8 @@ export abstract class Wallet<T extends Program> {
                 amount += used.length;
 
                 await this.sync(
-                    amount > this.options.unusedAddressCount
-                        ? { unusedAddressCount: amount }
+                    amount > this.options.minimumUnused
+                        ? { minimumUnused: amount }
                         : undefined
                 );
 
@@ -272,7 +263,7 @@ export abstract class Wallet<T extends Program> {
 
         if (!result.success) throw new Error(result.error);
 
-        if (!this.options.instantCoinRecords) return;
+        if (!this.options.updatePendingCoinRecords) return;
 
         const newCoinRecords: Array<CoinRecord> = [];
 

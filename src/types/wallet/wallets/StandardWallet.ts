@@ -1,28 +1,25 @@
-import { toHex } from 'chia-bls';
-import { CoinSpend, formatHex, FullNode, SpendBundle } from 'chia-rpc';
-import { Program } from 'clvm-lib';
+import { fromHex, toHex } from 'chia-bls';
 import {
-    calculateSyntheticPrivateKey,
-    calculateSyntheticPublicKey,
-} from '../../../utils/keys';
-import { puzzles } from '../../../utils/puzzles';
+    CoinSpend,
+    FullNode,
+    SpendBundle,
+    formatHex,
+    sanitizeHex,
+} from 'chia-rpc';
+import { Program } from 'clvm-lib';
 import { signSpendBundle } from '../../../utils/sign';
 import { StandardTransaction } from '../../puzzles/StandardTransaction';
 import { CoinSelection } from '../CoinSelection';
-import { KeyPair, KeyStore } from '../KeyStore';
+import { KeyStore } from '../KeyStore';
 import { Wallet, WalletOptions } from '../Wallet';
 
 export class StandardWallet extends Wallet<StandardTransaction> {
-    public readonly hiddenPuzzleHash: Uint8Array;
-
     constructor(
         node: FullNode,
         keyStore: KeyStore,
-        hiddenPuzzleHash: Uint8Array = puzzles.defaultHidden.hash(),
         walletOptions: Partial<WalletOptions> = {}
     ) {
         super(node, keyStore, walletOptions);
-        this.hiddenPuzzleHash = hiddenPuzzleHash;
     }
 
     public async sendFee(amount: number): Promise<CoinSpend[]> {
@@ -37,10 +34,14 @@ export class StandardWallet extends Wallet<StandardTransaction> {
         );
 
         const change =
-            this.puzzleCache[(await this.findUnusedIndices(1, []))[0]];
+            this.puzzleHashes[(await this.findUnusedIndices(1, []))[0]];
 
-        const puzzles = coinRecords.map(
-            (coinRecord) => this.puzzleCache[this.coinRecordIndex(coinRecord)]
+        const puzzles = coinRecords.map((coinRecord) =>
+            this.createPuzzle(
+                this.derivationIndexOf(
+                    fromHex(sanitizeHex(coinRecord.coin.puzzle_hash))
+                )
+            )
         );
 
         const coinSpends = coinRecords.map((record, i) => {
@@ -52,7 +53,7 @@ export class StandardWallet extends Wallet<StandardTransaction> {
                 if (spendAmount > amount) {
                     conditions.push(
                         Program.fromSource(
-                            `(51 ${formatHex(change.hashHex())} ${
+                            `(51 ${formatHex(toHex(change))} ${
                                 spendAmount - amount
                             })`
                         )
@@ -84,10 +85,14 @@ export class StandardWallet extends Wallet<StandardTransaction> {
         );
 
         const change =
-            this.puzzleCache[(await this.findUnusedIndices(1, []))[0]];
+            this.puzzleHashes[(await this.findUnusedIndices(1, []))[0]];
 
-        const puzzles = coinRecords.map(
-            (coinRecord) => this.puzzleCache[this.coinRecordIndex(coinRecord)]
+        const puzzles = coinRecords.map((coinRecord) =>
+            this.createPuzzle(
+                this.derivationIndexOf(
+                    fromHex(sanitizeHex(coinRecord.coin.puzzle_hash))
+                )
+            )
         );
 
         const coinSpends = coinRecords.map((record, i) => {
@@ -105,7 +110,7 @@ export class StandardWallet extends Wallet<StandardTransaction> {
                 if (spendAmount > totalAmount) {
                     conditions.push(
                         Program.fromSource(
-                            `(51 ${formatHex(change.hashHex())} ${
+                            `(51 ${formatHex(toHex(change))} ${
                                 spendAmount - totalAmount
                             })`
                         )
@@ -119,12 +124,9 @@ export class StandardWallet extends Wallet<StandardTransaction> {
         return coinSpends;
     }
 
-    public createPuzzle(keyPair: KeyPair): StandardTransaction {
+    public override createPuzzle(index: number): StandardTransaction {
         return new StandardTransaction(
-            calculateSyntheticPublicKey(
-                keyPair.publicKey,
-                this.hiddenPuzzleHash
-            )
+            this.keyStore.keys[index].syntheticPublicKey
         );
     }
 
@@ -137,13 +139,8 @@ export class StandardWallet extends Wallet<StandardTransaction> {
             aggSigMeExtraData,
             true,
             ...this.keyStore.keys
-                .filter((keyPair) => keyPair.privateKey !== null)
-                .map((keyPair) =>
-                    calculateSyntheticPrivateKey(
-                        keyPair.privateKey!,
-                        this.hiddenPuzzleHash
-                    )
-                )
+                .filter((keyPair) => keyPair.syntheticPrivateKey !== null)
+                .map((keyPair) => keyPair.syntheticPrivateKey!)
                 .concat(
                     this.keyStore.privateKey ? [this.keyStore.privateKey] : []
                 )
