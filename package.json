@@ -10,7 +10,8 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsc",
-        "watch": "tsc -w"
+        "watch": "tsc -w",
+        "test": "echo \"No tests written yet.\""
     },
     "files": [
         "dist",
