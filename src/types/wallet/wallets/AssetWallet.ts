@@ -16,7 +16,7 @@ import { puzzles } from '../../../utils/puzzles';
 import { signSpendBundle } from '../../../utils/sign';
 import { AssetToken } from '../../puzzles/AssetToken';
 import { StandardTransaction } from '../../puzzles/StandardTransaction';
-import { KeyPair, KeyStore } from '../KeyStore';
+import { KeyStore } from '../KeyStore';
 import { Wallet, WalletOptions } from '../Wallet';
 
 export class AssetWallet extends Wallet<AssetToken<StandardTransaction>> {
@@ -36,12 +36,14 @@ export class AssetWallet extends Wallet<AssetToken<StandardTransaction>> {
         this.hiddenPuzzleHash = hiddenPuzzleHash;
     }
 
-    public createPuzzle(keyPair: KeyPair): AssetToken<StandardTransaction> {
+    public override createPuzzle(
+        index: number
+    ): AssetToken<StandardTransaction> {
         return new AssetToken(
             this.assetId,
             new StandardTransaction(
                 calculateSyntheticPublicKey(
-                    keyPair.publicKey,
+                    this.keyStore.keys[index].publicKey,
                     this.hiddenPuzzleHash
                 )
             )

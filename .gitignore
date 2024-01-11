@@ -1,5 +1,9 @@
+# Node.js
 dist/
 node_modules/
-.DS_Store
-yarn-error.log
-.parcel-cache/
+
+# MacOS
+*.DS_Store
+
+# NPM package files
+/*.tgz

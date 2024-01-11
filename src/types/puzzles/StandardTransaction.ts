@@ -8,7 +8,7 @@ export class StandardTransaction extends Program {
 
     constructor(syntheticPublicKey: JacobianPoint) {
         super(
-            puzzles.payToDelegatedOrHidden.curry([
+            puzzles.standardTransaction.curry([
                 Program.fromJacobianPoint(syntheticPublicKey),
             ]).value
         );

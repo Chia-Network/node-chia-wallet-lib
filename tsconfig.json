@@ -3,13 +3,14 @@
         "moduleResolution": "node",
         "target": "ESNext",
         "module": "CommonJS",
-        "downlevelIteration": true,
+        "outDir": "dist",
         "esModuleInterop": true,
         "declaration": true,
+        "sourceMap": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitOverride": true,
-        "strict": true,
-        "types": ["node"]
-    }
+        "strict": true
+    },
+    "include": ["src"]
 }
